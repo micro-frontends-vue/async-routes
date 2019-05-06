@@ -1,0 +1,18 @@
+{
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "install": "lerna exec --parallel -- yarn",
+    "clean": "rm -rf node_modules && lerna exec --stream -- rm -rf node_modules",
+    "reinstall": "yarn clean && yarn",
+    "serve": "lerna run serve --parallel",
+    "build": "lerna run build --parallel",
+    "copy": "rimraf docs && node ./copy.js",
+    "build:example": "yarn build && yarn copy"
+  },
+  "devDependencies": {
+    "lerna": "^3.10.7",
+    "recursive-copy": "^2.0.9"
+  },
+  "license": "MIT"
+}
