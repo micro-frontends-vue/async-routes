@@ -11,20 +11,42 @@ const router = new Router({
       path: '/',
       redirect: '/app-typescript',
     },
+    {
+      path: '/404',
+      component: {
+        name: 'not-found',
+        template: '<h1>Not Found</h1>',
+      }
+    },
   ],
 });
 
+const cachedModules = new Set();
+
+const sleep = (time) => new Promise((resolve) => void setTimeout(resolve, time));
+
 router.beforeEach(async (to, from, next) => {
+  
   console.log('beforeEach:', to.path, from.path);
   const [, module] = to.path.split('/');
 
   if (Reflect.has(modules, module)) {
-    loadModule(modules[module]);
-    Reflect.deleteProperty(modules, module);
-    console.log('loaded:', module);
+    if (!cachedModules.has(module)) {
+      await loadModule(modules[module]);
+      await sleep(300); // 模拟延迟
+      cachedModules.add(module);
+      next(to.path);
+    } else {
+      next();
+    }
+    return 
   }
 
-  next();
+  if (to.matched.length) {
+    next();
+  } else {
+    next('/404');
+  }
 });
 
 export default router;
