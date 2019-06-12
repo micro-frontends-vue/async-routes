@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "vue": "^2.5.21",
+    "vue-progressbar": "^0.7.5",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },

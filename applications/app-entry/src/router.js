@@ -32,9 +32,11 @@ router.beforeEach(async (to, from, next) => {
 
   if (Reflect.has(modules, module)) {
     if (!cachedModules.has(module)) {
+      Vue.prototype.$Progress.start();
       await loadModule(modules[module]);
       await sleep(300); // 模拟延迟
       cachedModules.add(module);
+      Vue.prototype.$Progress.finish();
       next(to.path);
     } else {
       next();
