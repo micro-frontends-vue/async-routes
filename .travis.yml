@@ -4,7 +4,7 @@ notifications:
   email: false
 
 node_js:
-  - "8"
+  - "10"
 
 script:
   - npm run start && npm run build:example
