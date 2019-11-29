@@ -7,7 +7,7 @@ node_js:
   - "10"
 
 script:
-  - yarn start && yarn build:example
+  - npm run bootstrap && npm run build
 
 branches:
   only:
