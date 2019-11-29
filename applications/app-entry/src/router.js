@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import { loadModule } from './load-helper';
 import { modules } from './modules';
 
 Vue.use(Router);
@@ -26,14 +25,36 @@ const cachedModules = new Set();
 const sleep = (time) => new Promise((resolve) => void setTimeout(resolve, time));
 
 router.beforeEach(async (to, from, next) => {
-  
-  console.log('beforeEach:', to.path, from.path);
+
+  console.log('entry:', to.path, from.path);
   const [, module] = to.path.split('/');
 
   if (Reflect.has(modules, module)) {
     if (!cachedModules.has(module)) {
       Vue.prototype.$Progress.start();
-      await loadModule(modules[module]);
+
+      const { default: application } = await window.System.import(modules[module])
+      console.log('load application:', application);
+
+      if (application && application.routes) {
+        // 动态添加子项目的 route-list
+        router.addRoutes(application.routes);
+      }
+
+      if (application && application.beforeEach) {
+        router.beforeEach((to, from, next) => {
+          if (module === to.path.split('/')[1]) {
+            application.beforeEach(to, from, next);
+          } else {
+            next();
+          }
+        })
+      }
+
+      if (application && application.init) {
+        await application.init({});
+      }
+
       await sleep(300); // 模拟延迟
       cachedModules.add(module);
       Vue.prototype.$Progress.finish();
@@ -41,7 +62,7 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next();
     }
-    return 
+    return;
   }
 
   if (to.matched.length) {
